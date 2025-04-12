@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyecto 1 - Análisis de Seguridad</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">🔐 Proyecto 1 - Análisis de Seguridad</h1>
+
+    <!-- Actividad 1: Firewalls -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">1. Probabilidad de detección (firewalls)</div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="probA" class="form-label">Probabilidad de detección Firewall A (%)</label>
+            <input type="number" id="probA" class="form-control" value="80" min="0" max="100">
+          </div>
+          <div class="col-md-6">
+            <label for="probB" class="form-label">Probabilidad de detección Firewall B (%)</label>
+            <input type="number" id="probB" class="form-control" value="60" min="0" max="100">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="calcularFirewalls()">Calcular</button>
+        <div class="mt-3">
+          <p><strong>Ambos detectan:</strong> <span id="ambos">-</span></p>
+          <p><strong>Al menos uno detecta:</strong> <span id="alMenosUno">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actividad 2: Vectores de ataque -->
+    <div class="card mb-4">
+      <div class="card-header bg-danger text-white">2. Distribución de ataques (vectores)</div>
+      <div class="card-body">
+        <p>Modifica los porcentajes si lo deseas (deben sumar 100%)</p>
+        <div class="row">
+          <div class="col-md-4">
+            <label for="red" class="form-label">Red Interna (%)</label>
+            <input type="number" id="red" class="form-control" value="40" min="0" max="100">
+          </div>
+          <div class="col-md-4">
+            <label for="web" class="form-label">Web (%)</label>
+            <input type="number" id="web" class="form-control" value="35" min="0" max="100">
+          </div>
+          <div class="col-md-4">
+            <label for="usb" class="form-label">USB (%)</label>
+            <input type="number" id="usb" class="form-control" value="25" min="0" max="100">
+          </div>
+        </div>
+        <button class="btn btn-danger mt-3" onclick="actualizarGrafica()">Actualizar gráfica</button>
+        <canvas id="graficoAtaques" class="mt-4"></canvas>
+      </div>
+    </div>
+
+    <!-- Actividad 3: Claves numéricas -->
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">3. Claves numéricas (sin repetir)</div>
+      <div class="card-body">
+        <p>Claves de 5 dígitos sin repetir, el primero no puede ser cero.</p>
+        <button class="btn btn-success" onclick="calcularClaves()">Calcular</button>
+        <div class="mt-3">
+          <p><strong>Total de claves posibles:</strong> <span id="claves">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actividad 4: Equipo de seguridad -->
+    <div class="card mb-4">
+      <div class="card-header bg-warning">4. Formar un equipo de seguridad</div>
+      <div class="card-body">
+        <label class="form-label">Cantidad total de personas disponibles:</label>
+        <input type="number" id="personas" class="form-control mb-3" value="8" min="3" max="100">
+        <button class="btn btn-success" onclick="calcularEquipos()">Calcular</button>
+        <div class="mt-3">
+          <p><strong>Formas posibles de asignar 3 roles distintos:</strong> <span id="equipos">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-5">
+      <p class="text-muted">Desarrollado para el Proyecto 1: Análisis de Sistemas de Seguridad.</p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function calcularFirewalls() {
+      let A = parseFloat(document.getElementById('probA').value) / 100;
+      let B = parseFloat(document.getElementById('probB').value) / 100;
+      let ambos = (A * B).toFixed(4);
+      let alMenosUno = (A + B - A * B).toFixed(4);
+
+      document.getElementById('ambos').textContent = (ambos * 100).toFixed(2) + " %";
+      document.getElementById('alMenosUno').textContent = (alMenosUno * 100).toFixed(2) + " %";
+    }
+
+    function calcularClaves() {
+      let total = 9 * 9 * 8 * 7 * 6;
+      document.getElementById('claves').textContent = total.toLocaleString();
+    }
+
+    function calcularEquipos() {
+      let n = parseInt(document.getElementById('personas').value);
+      let total = n * (n - 1) * (n - 2);
+      document.getElementById('equipos').textContent = total.toLocaleString();
+    }
+
+    // Chart.js - Vectores de ataque
+    let ctx = document.getElementById('graficoAtaques').getContext('2d');
+    let grafico = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Red Interna', 'Web', 'USB'],
+        datasets: [{
+          data: [40, 35, 25],
+          backgroundColor: ['#0d6efd', '#dc3545', '#198754']
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    function actualizarGrafica() {
+      let red = parseFloat(document.getElementById('red').value);
+      let web = parseFloat(document.getElementById('web').value);
+      let usb = parseFloat(document.getElementById('usb').value);
+
+      grafico.data.datasets[0].data = [red, web, usb];
+      grafico.update();
+    }
+  </script>
+
+</body>
+</html>
